@@ -52,7 +52,7 @@ La copia del file createChannel è necessaria a causa di un bug presente nella v
 curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.3.3 1.5.2
 cp -r custom-commercial-paper fabric-samples
 cp createChannel.sh fabric-samples/test-network/scripts
-chmod +x fabric-samples/test-network/createChannel.sh
+chmod +x fabric-samples/test-network/scripts/createChannel.sh
 ```
 
 ## Setup ambiente Python
