@@ -7,7 +7,7 @@ from .. import ipfs_files_util as ipfs
 
 
 def getallAssets(id):
-    path = os.path.join(os.getcwd(),'fabric-samples/commercial-paper/digibank/magnetocorp/go2')
+    path = os.path.join(os.getcwd(),'fabric-samples/custom-commercial-paper/digibank/magnetocorp/go2')
     cmd = 'go run main.go'+" -id "+id+" -getall"
     result = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True)
 
@@ -31,7 +31,7 @@ def getallAssets(id):
     return json.loads(json_data)
 
 def createAsset(id,cid,modeltype,accuracy = 0):
-    path = os.path.join(os.getcwd(),'fabric-samples/commercial-paper/organization/digibank/go2')
+    path = os.path.join(os.getcwd(),'fabric-samples/custom-commercial-paper/organization/digibank/go2')
     cmd = 'go run main.go'+" -id "+id+" -create -cid "+cid+" -modeltype "+modeltype +" -accuracy "+str(accuracy)
     result = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True)
 
@@ -42,7 +42,7 @@ def createAsset(id,cid,modeltype,accuracy = 0):
         return True
 
 def deleteAsset(id,cid):
-    path = os.path.join(os.getcwd(),'fabric-samples/commercial-paper/organization/digibank/go2')
+    path = os.path.join(os.getcwd(),'fabric-samples/custom-commercial-paper/organization/digibank/go2')
     cmd = 'go run main.go'+" -id "+id+" -delete -cid "+cid
     result = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True)
 
@@ -57,7 +57,7 @@ def deleteAssetsFromCidsList(id, cids):
 
 
 def getModelsByType(id,modeltype):
-    path = os.path.join(os.getcwd(),'fabric-samples/commercial-paper/organization/digibank/go2')
+    path = os.path.join(os.getcwd(),'fabric-samples/custom-commercial-paper/organization/digibank/go2')
     cmd = 'go run main.go'+" -id "+id+" -getmodelsbytype -modeltype "+modeltype
     result = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True)
     if result.returncode != 0:

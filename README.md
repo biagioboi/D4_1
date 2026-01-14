@@ -86,8 +86,15 @@ Il progetto può essere esteso in futuro con:
 - smart contract più avanzati,
 - meccanismi di detection e game theory completamente integrati.
 
+Requirements for this project are `ipfs`, `Python3.11`, `docker-compose` and `docker`
+
 ```sh
-python3.11 -m venv venv
+curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.3.3 1.5.2
+cp custom-commercial-paper fabric-samples/test-network
+```
+
+```sh
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -96,7 +103,7 @@ pip install -r requirements.txt
 cd fabric-samples/test-network
 ./network.sh down
 ./network.sh up createChannel -ca -c mychannel -s couchdb
-./network.sh deployCC -c mychannel -ccn papercontract -ccp ../commercial-paper/organization/digibank/contract-go/ -ccl go -ccep "OR('Org1MSP.peer','Org2MSP.peer')"
+./network.sh deployCC -c mychannel -ccn papercontract -ccp ../custom-commercial-paper/organization/digibank/contract-go/ -ccl go -ccep "OR('Org1MSP.peer','Org2MSP.peer')"
 ```
 
 ```sh
