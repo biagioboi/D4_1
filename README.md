@@ -1,103 +1,69 @@
-# Demo – Federated Learning con supporto Blockchain e rollback
+# Demo – Federated Learning con supporto Blockchain per il salvataggio dei pesi dei modelli.
 
 ## Descrizione generale
 
-Questo progetto rappresenta una **demo sperimentale** a supporto del Deliverable **D4.2 – “Progettazione del meccanismo di rollback per tolleranza ad attacchi poisoning”** del progetto SEM.
+Questo progetto rappresenta una demo sperimentale a supporto del Deliverable  
+**D4.1 – "Analisi e progettazione dell’integrazione tra blockchain e IPFS per la memorizzazione in sicurezza dei parametri del modello di AI."** del progetto SEM.
 
-L’obiettivo non è fornire una piattaforma completa o pronta per l’uso industriale, ma **mostrare in modo pratico e sperimentale** come:
+La demo mostra:
 
-- attacchi di poisoning possano degradare un processo di Federated Learning,
-- la storia delle versioni del modello possa essere tracciata,
-- e come un meccanismo di rollback concettuale possa essere supportato da tecnologie di tipo blockchain.
+- un processo di Federated Learning;
+- il salvataggio e la tracciabilità delle versioni di un modello locale e globale su IPFS e su Hyperledger Fabric;
+- l’uso di una blockchain per la registrazione di metadati associati alle versioni del modello.
 
-Il progetto va quindi inteso come **proof-of-concept / ambiente di test**, utile a validare idee architetturali e ipotesi di ricerca descritte nel documento D4.2.
+## Federated Learning e attacchi di poisoning (`devp/`)
 
-## Contenuti del progetto
+La cartella `devp/` contiene notebook Jupyter utilizzati per:
 
-### 1. Federated Learning e attacchi di poisoning (cartella `devp/`)
+- simulare un processo di Federated Learning con più client;
+- addestrare modelli di classificazione;
+- introdurre attacchi di poisoning (label flipping, aggiornamenti malevoli);
+- osservare l’andamento delle metriche del modello globale.
 
-La cartella `devp/` contiene diversi notebook Jupyter, utilizzati per:
-
-- simulare un processo di **Federated Learning** con più client;
-- addestrare modelli di classificazione (es. CIFAR-10);
-- introdurre **attacchi di poisoning**, in particolare *label flipping* e aggiornamenti malevoli;
-- osservare l’impatto degli attacchi sull’accuratezza e sulla loss del modello globale lungo più round.
-
-Questa parte costituisce il **cuore sperimentale ML** del progetto e serve a mostrare quando e perché un rollback diventa necessario.
-
-### 2. Concetto di versioning e rollback del modello
+## Versioning del modello
 
 Durante le simulazioni:
 
 - i modelli vengono salvati a diversi round;
-- si osserva la degradazione delle metriche in presenza di attacchi;
-- si individua manualmente o logicamente un punto “robusto” della storia del modello a cui tornare.
+- le prestazioni del modello vengono monitorate nel tempo.
 
-Il **rollback** non è completamente automatizzato ma è **sperimentato a livello concettuale**, coerentemente con quanto descritto nel D4.2, che si concentra sulla progettazione e non sull’implementazione finale.
+## Supporto Blockchain (`devp`)
 
-### 3. Supporto Blockchain (cartella `dev-fabric/`)
+La cartella `devp/` contiene il codice necessario a comunicare con la rete Fabric che verrà eseguita di seguito. Contiene le funzioni per:
 
-La cartella `dev-fabric/` contiene una copia dell’ambiente **Hyperledger Fabric (dev mode)** utilizzata per sperimentare:
+- registrare asset su ledger;
+- memorizzare hash, identificativi e owner delle versioni del modello;
+- interrogare il ledger per finalità di tracciabilità.
 
-- la registrazione di asset su ledger;
-- la memorizzazione di **hash, identificativi e owner** associati a versioni di modello;
-- query di lettura dal ledger (tracciabilità, auditabilità).
+La blockchain è utilizzata come registro di metadati.  
+Il training del modello e i pesi sono gestiti off-chain.
 
-La blockchain è usata **solo come registro di metadati**, non per il training né per la memorizzazione diretta dei pesi del modello, in linea con il D4.2.
+## Requisiti
 
-### 4. Script di query e interrogazione
+- `Python 3.11`
+- `ipfs`
+- `docker`
+- `docker-compose`
 
-- `querybc`  
-   Contiene comandi di esempio per interrogare il chaincode Fabric (init, query asset, query per owner, CID).
-- `query couchdb`  
-   Contiene una query Mango per interrogare CouchDB, usato come state database di Fabric.
-
-Questi file servono come **supporto operativo** e dimostrativo.
-
-## Cosa il progetto **è**
-
-- Un **ambiente di test e sperimentazione**
-- Un **supporto pratico** alle scelte progettuali del D4.2
-- Un esempio di integrazione concettuale tra:
-   - Federated Learning
-   - attacchi di poisoning
-   - versioning del modello
-   - blockchain come registro immutabile
-
-## Cosa il progetto **non è**
-
-- Non è una piattaforma industriale completa
-- Non è una implementazione finale del meccanismo di rollback
-- Non include automazione completa, smart contract avanzati o IPFS pienamente integrato
-- Non garantisce completezza, robustezza o conformità produttiva
-
-## Obiettivo finale
-
-Lo scopo del progetto è **rendere tangibile e sperimentabile** quanto descritto nel Deliverable D4.2, fornendo:
-
-- esempi concreti di poisoning nel Federated Learning;
-- una dimostrazione della necessità del rollback;
-- un primo utilizzo di blockchain per tracciabilità e audit delle versioni del modello.
-
-Il progetto può essere esteso in futuro con:
-
-- decisioni automatiche di rollback,
-- integrazione reale con IPFS,
-- smart contract più avanzati,
-- meccanismi di detection e game theory completamente integrati.
-
-Requirements for this project are `ipfs`, `Python3.11`, `docker-compose` and `docker`
+## Setup ambiente Hyperledger Fabric
+La copia del file createChannel è necessaria a causa di un bug presente nella versione di Fabric 2.3.3
 
 ```sh
 curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.3.3 1.5.2
-cp custom-commercial-paper fabric-samples/test-network
+cp -r custom-commercial-paper fabric-samples
+cp createChannel.sh fabric-samples/test-network/scripts
+chmod +x fabric-samples/test-network/createChannel.sh
 ```
+
+## Setup ambiente Python
 
 ```sh
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+## Avvio rete Fabric e deploy smart contract
 
 ```sh
 cd fabric-samples/test-network
@@ -106,8 +72,9 @@ cd fabric-samples/test-network
 ./network.sh deployCC -c mychannel -ccn papercontract -ccp ../custom-commercial-paper/organization/digibank/contract-go/ -ccl go -ccep "OR('Org1MSP.peer','Org2MSP.peer')"
 ```
 
+## Avvio demo applicativa
+
 ```sh
 cd ../..
 python main.py
 ```
-
