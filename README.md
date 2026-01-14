@@ -93,6 +93,14 @@ pip install -r requirements.txt
 ```
 
 ```sh
+cd fabric-samples/test-network
+./network.sh down
+./network.sh up createChannel -ca -c mychannel -s couchdb
+./network.sh deployCC -c mychannel -ccn papercontract -ccp ../commercial-paper/organization/digibank/contract-go/ -ccl go -ccep "OR('Org1MSP.peer','Org2MSP.peer')"
+```
 
+```sh
+cd ../..
+python main.py
 ```
 
